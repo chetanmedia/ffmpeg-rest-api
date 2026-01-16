@@ -25,9 +25,8 @@ RUN npm prune --production
 # Expose port
 EXPOSE 3000
 
-# Copy and setup start script
-COPY start.sh ./
-RUN chmod +x start.sh
+# Copy PM2 ecosystem config
+COPY ecosystem.config.js ./
 
-# Start the application (both API server and worker)
-CMD ["./start.sh"]
+# Start both processes with PM2
+CMD ["npx", "pm2-runtime", "start", "ecosystem.config.js"]
