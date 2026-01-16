@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - WORKER_CONCURRENCY=5
+      - STORAGE_MODE=stateless
+      # Uncomment for S3 mode
+      # - STORAGE_MODE=s3
+      # - S3_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+      # - S3_REGION=auto
+      # - S3_BUCKET=ffmpeg-rest
+      # - S3_ACCESS_KEY_ID=your-access-key
+      # - S3_SECRET_ACCESS_KEY=your-secret-key
+      # - S3_PUBLIC_URL=https://media.yourdomain.com
+      # - S3_PATH_PREFIX=ffmpeg-rest
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+      - ./temp:/app/temp
+    restart: unless-stopped
+
+volumes:
+  redis-data:
