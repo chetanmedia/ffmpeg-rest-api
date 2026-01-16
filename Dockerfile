@@ -25,9 +25,5 @@ RUN npm prune --production
 # Expose port
 EXPOSE 3000
 
-# Copy start script
-COPY start.sh ./
-RUN chmod +x start.sh
-
 # Start the application (both API server and worker)
-CMD ["./start.sh"]
+CMD sh -c "node dist/worker.js & node dist/index.js"
