@@ -25,8 +25,5 @@ RUN npm prune --production
 # Expose port
 EXPOSE 3000
 
-# Copy PM2 ecosystem config
-COPY ecosystem.config.js ./
-
-# Start both processes with PM2
-CMD ["npx", "pm2-runtime", "start", "ecosystem.config.js"]
+# Start both processes - worker in background, API in foreground
+CMD node dist/worker.js & node dist/index.js
